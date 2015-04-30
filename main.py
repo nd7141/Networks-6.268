@@ -1,3 +1,4 @@
+from __future__ import division
 __author__ = 'sivanov'
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -20,29 +21,61 @@ def CC_analysis(G):
     # for i, size in enumerate(sizes[:10]):
     #     print i+1, size
 
-def powerlaw_fit(G):
+def powerlaw_fit(G,subplot, add_title):
     degrees = G.degree().values()
     fit = powerlaw.Fit(degrees, xmin=None)
     print fit.power_law.alpha
     print fit.power_law.sigma
     print fit.power_law.xmin
-    fig = fit.plot_pdf()
-    fit.power_law.plot_pdf(linestyle='--')
-    plt.title('Degree Distribution')
+    plt.subplot(3,1,subplot)
+    fit.plot_pdf(linewidth=2)
+    fit.power_law.plot_pdf(linestyle='--', linewidth=2)
+    plt.title(add_title + r'Degree Distribution. $\alpha=%s$' %(fit.power_law.alpha))
     plt.xlabel('Degree k')
     plt.ylabel('P(x = k)')
-    plt.show()
+    # plt.show()
     print fit.distribution_compare('power_law', 'exponential', normalized_ratio=True)
 
+def plot_degree(G):
+
+    degree_sequence=sorted(nx.degree(G).values(),reverse=True) # degree sequence
+
+    plt.loglog(degree_sequence,'b-',marker='o')
+    plt.title("Degree rank plot")
+    plt.ylabel("degree")
+    plt.xlabel("rank")
+    plt.show()
+
+def plot_freq(G, add_title):
+    n = len(G)
+    degrees = G.degree().values()
+    from collections import Counter
+    counts = Counter(degrees)
+    freq = {}
+    for c in counts:
+        freq[c] = counts[c]/n
+    plt.subplot(3,1,3)
+    plt.plot(*zip(*freq.items()), linewidth=2)
+    # plt.xlim([0,100])
+    plt.title(add_title + 'Degree Distribution')
+    plt.xlabel('Degree k')
+    plt.ylabel('P(x = k)')
+    # plt.xscale('log')
+    # plt.show()
 
 if __name__ == "__main__":
 
     G1 = read_file("Email-Enron.txt")
-    # G2 = read_file("CA-HepPh.txt")
-    # G3 = read_file("roadNet-TX.txt")
+    G2 = read_file("CA-HepPh.txt")
+    G3 = read_file("roadNet-TX.txt")
 
-    powerlaw_fit(G1)
-    # powerlaw_fit(G2)
+    powerlaw_fit(G1,1,'Email Network. ')
+    powerlaw_fit(G2,2,'Collaboration Network. ')
     # powerlaw_fit(G3)
+
+    plot_freq(G3,'Roads Network. ')
+
+    plt.tight_layout()
+    plt.show()
 
     console = []
