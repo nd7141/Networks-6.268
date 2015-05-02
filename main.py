@@ -14,12 +14,20 @@ def read_file(filename):
     print 'n: %s m: %s' %(len(G), len(G.edges()))
     return G
 
-def CC_analysis(G):
+def CC_analysis(G, subplot, add_title=''):
     CCs = list(nx.connected_components(G))
-    print len(CCs)
-    # sizes = sorted([len(cc) for cc in CCs], reverse=True)
-    # for i, size in enumerate(sizes[:10]):
-    #     print i+1, size
+    sizes = sorted([len(cc) for cc in CCs], reverse=True)
+    print 'Total number of CCs is', len(CCs)
+    print 'The size of largest connected component is', sizes[0]
+    print 'The size of second largest connected component is', sizes[1]
+    print len(G), np.log(len(G))
+    plt.subplot(3,1,subplot)
+    plt.hist(sizes, bins=range(1,21))
+    plt.title(add_title + "Sizes of connected components")
+    plt.xlabel("Size")
+    plt.ylabel("Frequency")
+    # plt.show()
+    return sizes
 
 def powerlaw_fit(G,subplot, add_title):
     degrees = G.degree().values()
@@ -33,7 +41,7 @@ def powerlaw_fit(G,subplot, add_title):
     plt.title(add_title + r'Degree Distribution. $\alpha=%s$' %(fit.power_law.alpha))
     plt.xlabel('Degree k')
     plt.ylabel('P(x = k)')
-    # plt.show()
+    plt.show()
     print fit.distribution_compare('power_law', 'exponential', normalized_ratio=True)
 
 def plot_degree(G):
@@ -65,17 +73,22 @@ def plot_freq(G, add_title):
 
 if __name__ == "__main__":
 
-    G1 = read_file("Email-Enron.txt")
-    G2 = read_file("CA-HepPh.txt")
-    G3 = read_file("roadNet-TX.txt")
+    # G1 = read_file("Email-Enron.txt")
+    # G2 = read_file("CA-HepPh.txt")
+    # G3 = read_file("roadNet-TX.txt")
+    G4 = read_file("flixster.txt")
+    powerlaw_fit(G4, 1, '')
 
-    powerlaw_fit(G1,1,'Email Network. ')
-    powerlaw_fit(G2,2,'Collaboration Network. ')
+    # powerlaw_fit(G1,1,'Email Network. ')
+    # powerlaw_fit(G2,2,'Collaboration Network. ')
     # powerlaw_fit(G3)
 
-    plot_freq(G3,'Roads Network. ')
+    # plot_freq(G3,'Roads Network. ')
 
-    plt.tight_layout()
-    plt.show()
+    # CC_analysis(G1, 1, 'Email Network. ')
+    # CC_analysis(G2, 2, 'Collaboration Network. ')
+    # CC_analysis(G3, 3, 'Roads Network. ')
+    # plt.tight_layout()
+    # plt.show()
 
     console = []
